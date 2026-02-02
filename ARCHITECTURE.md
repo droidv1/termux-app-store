@@ -179,8 +179,8 @@ Binary builds:
 
 Binary mode is detected via:
 ```python
-getattr(sys, "frozen", False)```
-
+getattr(sys, "frozen", False)
+```
 ---
 
 ## 🔐 Security Considerations
