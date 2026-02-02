@@ -171,4 +171,4 @@ Jika proyek ini membantu:
 - 🐛 Laporkan issue
 - 🔀 Kirim PR
 
-© Termux App Store — Built for hackers who care.
+© Termux App Store — Built for everyone.
