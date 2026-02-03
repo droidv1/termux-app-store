@@ -22,6 +22,8 @@ jobs:
           CHANGELOG="CHANGELOG.md"
           PACKAGES_DIR="packages"
 
+          [[ -f "$CHANGELOG" ]] || echo -e "# Changelog\n\n## [Unreleased]\n" > "$CHANGELOG"
+
           ADDED=""
           CHANGED=""
           FIXED=""
@@ -41,7 +43,9 @@ jobs:
               continue
             fi
 
-            if ! grep -A 1000 "## \[Unreleased\]" "$CHANGELOG" | grep -q "$PKG_NAME v$PKG_VERSION"; then
+            SAFE_NAME=$(printf '%s\n' "$PKG_NAME v$PKG_VERSION" | sed 's/[\/&]/\\&/g')
+
+            if ! sed -n '/## \[Unreleased\]/,/^## /p' "$CHANGELOG" | grep -q "$SAFE_NAME"; then
               ADDED="$ADDED- Package \`$PKG_NAME\` v$PKG_VERSION"$'\n'
             fi
           done
@@ -55,29 +59,19 @@ jobs:
             echo -e "## [Unreleased]\n" | cat - "$CHANGELOG" > temp && mv temp "$CHANGELOG"
           fi
 
-          insert_section_safe() {
+          insert_section() {
             local section="$1"
             local content="$2"
-
-            TMP=$(mktemp)
-            awk -v sec="### $section" -v cont="$content" '
-            BEGIN { inserted=0 }
-            /^## \[Unreleased\]/ {
-              print
-              if (!inserted) {
-                print sec "\n" cont
-                inserted=1
-              }
-              next
-            }
-            { print }
-            ' "$CHANGELOG" > "$TMP"
-            mv "$TMP" "$CHANGELOG"
+            if grep -q "### $section" "$CHANGELOG"; then
+              sed -i "/### $section/a $(printf '%s' "$content")" "$CHANGELOG"
+            else
+              sed -i "/## \[Unreleased\]/a ### $section\n$(printf '%s' "$content")" "$CHANGELOG"
+            fi
           }
 
-          [[ -n "$ADDED" ]] && insert_section_safe "Added" "$ADDED"
-          [[ -n "$CHANGED" ]] && insert_section_safe "Changed" "$CHANGED"
-          [[ -n "$FIXED" ]] && insert_section_safe "Fixed" "$FIXED"
+          [[ -n "$ADDED" ]] && insert_section "Added" "$ADDED"
+          [[ -n "$CHANGED" ]] && insert_section "Changed" "$CHANGED"
+          [[ -n "$FIXED" ]] && insert_section "Fixed" "$FIXED"
 
       - name: Commit changelog updates (only if changed)
         run: |
