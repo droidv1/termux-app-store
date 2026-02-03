@@ -17,6 +17,7 @@ jobs:
 
       - name: Scan packages and prepare changelog entries
         run: |
+          set -e
           CHANGELOG="CHANGELOG.md"
           PACKAGES_DIR="packages"
 
@@ -39,7 +40,7 @@ jobs:
               continue
             fi
 
-            if ! sed -n '/## \[Unreleased\]/,/^## /p' "$CHANGELOG" | grep -q "$PKG_NAME v$PKG_VERSION"; then
+            if ! awk "/## \[Unreleased\]/,/^## /" "$CHANGELOG" | grep -q "$PKG_NAME v$PKG_VERSION"; then
               ADDED="$ADDED- Package \`$PKG_NAME\` v$PKG_VERSION"$'\n'
             fi
           done
@@ -58,13 +59,13 @@ jobs:
             local content="$2"
             TMP=$(mktemp)
 
-            sed '/## \[Unreleased\]/q' "$CHANGELOG" > "$TMP"
+            awk '/## \[Unreleased\]/ {exit} {print}' "$CHANGELOG" > "$TMP"
 
             echo "## [Unreleased]" >> "$TMP"
             echo "### $section" >> "$TMP"
             printf '%s\n' "$content" >> "$TMP"
 
-            sed '1,/## \[Unreleased\]/d' "$CHANGELOG" >> "$TMP"
+            awk '/## \[Unreleased\]/ {flag=1; next} flag {print}' "$CHANGELOG" >> "$TMP"
 
             mv "$TMP" "$CHANGELOG"
           }
