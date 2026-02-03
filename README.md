@@ -108,11 +108,11 @@ atau `./termux-build lint <package>`
 - ❌ Tidak build otomatis
 - ❌ Tidak upload ke GitHub
 - ✅ Hanya membaca & memvalidasi
-Tool ini dirancang untuk:
-- Contributor
-- Reviewer
-- Maintainer
-- CI check
+- Tool ini dirancang untuk:
+  - Contributor
+  - Reviewer
+  - Maintainer
+  - CI check
 
 ---
 
