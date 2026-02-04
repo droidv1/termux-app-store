@@ -18,6 +18,12 @@ and this project adheres to semantic versioning.
 
 ## [v0.1.0] - 2026-02-02
 ### Added
+- Package `encrypt` v1.1
+- Package `pmcli` v0.1.0
+- Package `tdoc` v1.0.5
+- Package `termstyle` v1.0.0
+- Package `webshake` v1.0.2
+
 - Textual-based TUI application for Termux
 - Package browser with search and live preview
 - Install / Update workflow using `build-package.sh`
