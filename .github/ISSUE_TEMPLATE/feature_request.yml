@@ -6,23 +6,23 @@ assignees: []
 
 body:
   - type: markdown
-    content: |
-      Terima kasih sudah mengajukan fitur baru!
-      Silakan isi semua field agar tim bisa menilai dan menindaklanjuti.
+    attributes:
+      value: |
+        Terima kasih sudah mengajukan fitur baru!
 
   - type: input
     id: feature_title
     attributes:
       label: Judul Fitur
-      placeholder: Misal: Multi-arch Prebuilt Cache
-    required: true
+    validations:
+      required: true
 
   - type: textarea
     id: feature_description
     attributes:
       label: Deskripsi Fitur
-      placeholder: Jelaskan fitur secara rinci dan manfaatnya.
-    required: true
+    validations:
+      required: true
 
   - type: dropdown
     id: priority
@@ -32,29 +32,25 @@ body:
         - Tinggi
         - Sedang
         - Rendah
-      description: Seberapa penting fitur ini menurut Anda
-    required: true
+    validations:
+      required: true
 
   - type: textarea
     id: use_case
     attributes:
       label: Use Case / Contoh Penggunaan
-      placeholder: Misal: Membantu user download paket tanpa build dari source.
 
   - type: textarea
     id: additional_context
     attributes:
       label: Konteks Tambahan
-      placeholder: Misal: Relevan untuk perangkat offline, atau integrasi CI/CD.
 
   - type: input
     id: termux_version
     attributes:
       label: Termux Version
-      placeholder: Misal: 0.145
 
   - type: input
     id: android_version
     attributes:
       label: Android Version
-      placeholder: Misal: 12
