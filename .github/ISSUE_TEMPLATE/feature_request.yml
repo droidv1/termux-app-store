@@ -1,27 +1,28 @@
 name: ✨ Feature Request
 description: Ajukan ide atau fitur baru untuk Termux App Store.
 title: "[FEATURE] "
-labels: enhancement
+labels: [enhancement]
 assignees: []
 
 body:
   - type: markdown
     content: |
-      Terima kasih sudah mengajukan fitur baru! Silakan isi semua field agar tim bisa menilai dan menindaklanjuti.
+      Terima kasih sudah mengajukan fitur baru!
+      Silakan isi semua field agar tim bisa menilai dan menindaklanjuti.
 
   - type: input
     id: feature_title
     attributes:
       label: Judul Fitur
       placeholder: Misal: Multi-arch Prebuilt Cache
-      required: true
+    required: true
 
   - type: textarea
     id: feature_description
     attributes:
       label: Deskripsi Fitur
       placeholder: Jelaskan fitur secara rinci dan manfaatnya.
-      required: true
+    required: true
 
   - type: dropdown
     id: priority
@@ -32,13 +33,13 @@ body:
         - Sedang
         - Rendah
       description: Seberapa penting fitur ini menurut Anda
-      required: true
+    required: true
 
   - type: textarea
     id: use_case
     attributes:
       label: Use Case / Contoh Penggunaan
-      placeholder: Misal: Membantu user download paket tanpa membangun dari source setiap kali.
+      placeholder: Misal: Membantu user download paket tanpa build dari source.
 
   - type: textarea
     id: additional_context

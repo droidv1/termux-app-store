@@ -1,5 +1,9 @@
 blank_issues_enabled: false
 contact_links:
+  - name: 💬 Diskusi / Tanya Umum
+    url: https://github.com/djunekz/termux-app-store/discussions
+    about: Gunakan Discussions untuk pertanyaan umum atau diskusi non-bug.
+
   - name: 🐞 Bug Report
     url: .github/ISSUE_TEMPLATE/bug_report.yml
     about: Laporkan bug atau error di Termux App Store dengan lengkap
