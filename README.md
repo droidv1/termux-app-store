@@ -45,7 +45,7 @@
 ---
 
 ## 🧱 Arsitektur
-Detail: lihat [ARCHITECTURE.md](ARCHITECTURE.md)
+Detail lengkap: [ARCHITECTURE.md](ARCHITECTURE.md)
 
 ---
 
@@ -189,9 +189,9 @@ Termux App Store dibuat untuk pengguna yang ingin:
 Upload tool ke Termux App Store dibuat untuk:
 - Tool diunduh banyak orang
 - Keuntungan bagi yang punya tool di Termux App Store:
- - Update tool hanya mengubah (*version dan sha256*) di file build.sh
-**Cara upload tool**:
-- klik dan baca [HOW_TO_UPLOAD](HOW_TO_UPLOAD.md)
+  - Update tool hanya mengubah (*version dan sha256*) di file build.sh
+- **Cara upload tool**:
+  - klik dan baca [HOW_TO_UPLOAD](HOW_TO_UPLOAD.md)
 
 ---
 
