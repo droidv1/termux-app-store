@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-set -eo pipefail
+set -Eeuo pipefail
 
 FILE="$1"
 
@@ -52,9 +52,33 @@ if grep -q "apt install" "$FILE"; then
     echo "⚠️  WARN : apt install found (use pkg install instead)"
 fi
 
+# ---------- REAL SHA256 CHECK ----------
+SRCURL=$(grep "^TERMUX_PKG_SRCURL=" "$FILE" | cut -d= -f2- | tr -d '"')
+EXPECTED_SHA=$(grep "^TERMUX_PKG_SHA256=" "$FILE" | cut -d= -f2- | tr -d '"')
+
+if [[ -n "$SRCURL" && -n "$EXPECTED_SHA" ]]; then
+    echo
+    echo "🔎 Verifying SHA256 of source..."
+    TMPFILE=$(mktemp)
+    if ! curl -sL "$SRCURL" -o "$TMPFILE"; then
+        echo "❌ Failed to download source from $SRCURL"
+        FAIL=1
+    else
+        ACTUAL_SHA=$(sha256sum "$TMPFILE" | awk '{print $1}')
+        rm -f "$TMPFILE"
+        if [[ "$ACTUAL_SHA" != "$EXPECTED_SHA" ]]; then
+            echo "❌ SHA256 mismatch!"
+            echo "   Expected: $EXPECTED_SHA"
+            echo "   Got     : $ACTUAL_SHA"
+            FAIL=1
+        else
+            echo "✅ SHA256 verified"
+        fi
+    fi
+fi
+
 # ---------- RESULT ----------
 echo "-------------------------------------------------"
-
 if [[ "$FAIL" -eq 1 ]]; then
     echo "❌ VALIDATION FAILED"
     exit 1
