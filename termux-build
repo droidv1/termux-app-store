@@ -5,6 +5,11 @@ COMMAND="${1:-}"
 BASE_DIR="$(dirname "$0")"
 
 case "$COMMAND" in
+    create)
+        shift
+        exec "$ROOT/tools/termux-build-create.sh" "$@"
+        ;;
+
     lint)
         shift
         exec "$BASE_DIR/tools/termux-build-lint.sh" "$@"
@@ -38,6 +43,7 @@ case "$COMMAND" in
 
     *)
         echo "Usage:"
+        echo "  ./termux-build create <package>"
         echo "  ./termux-build lint [path | package-name]"
         echo "  ./termux-build check-pr <package>"
         echo "  ./termux-build doctor"
