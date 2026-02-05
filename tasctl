@@ -1,0 +1,118 @@
+#!/data/data/com.termux/files/usr/bin/bash
+set -euo pipefail
+
+APP_NAME="termux-app-store"
+CTL_NAME="tasctl"
+
+INSTALL_DIR="$PREFIX/lib/.tas"
+BIN_DIR="$PREFIX/bin"
+REPO="djunekz/termux-app-store"
+VERSION="latest"
+
+BIN_PATH="$INSTALL_DIR/$APP_NAME"
+SYMLINK="$BIN_DIR/$APP_NAME"
+
+log()  { printf "[*] %s\n" "$*"; }
+ok()   { printf "✓ %s\n" "$*"; }
+warn() { printf "⚠ %s\n" "$*" >&2; }
+err()  { printf "✗ %s\n" "$*" >&2; exit 1; }
+
+# ---------------- ARCH DETECTION ----------------
+detect_arch() {
+  case "$(uname -m)" in
+    aarch64) echo "termux-app-store-aarch64" ;;
+    armv7l)  echo "termux-app-store-arm" ;;
+    x86_64)  echo "termux-app-store-x86_64" ;;
+    *) err "Unsupported architecture: $(uname -m)" ;;
+  esac
+}
+
+# ---------------- ENV CHECK (INFO ONLY) ----------------
+check_env() {
+  log "Checking environment (non-blocking)"
+
+  if command -v python3 >/dev/null 2>&1; then
+    ok "Python: $(python3 --version)"
+  elif command -v python >/dev/null 2>&1; then
+    ok "Python: $(python --version)"
+  else
+    warn "Python not found (binary mode OK)"
+  fi
+
+  if python3 - <<'EOF' >/dev/null 2>&1
+import textual
+EOF
+  then
+    TXT_VER=$(python3 - <<'EOF'
+import textual; print(textual.__version__)
+EOF
+)
+    ok "Textual: v$TXT_VER"
+  else
+    warn "Textual not found (binary mode OK)"
+  fi
+}
+
+# ---------------- INSTALL / UPDATE ----------------
+install_app() {
+  BIN="$(detect_arch)"
+  URL="https://github.com/$REPO/releases/$VERSION/download/$BIN"
+
+  log "Installing $APP_NAME"
+  mkdir -p "$INSTALL_DIR"
+
+  log "Downloading binary: $BIN"
+  curl -fL "$URL" -o "$BIN_PATH"
+
+  chmod +x "$BIN_PATH"
+  ln -sf "$BIN_PATH" "$SYMLINK"
+
+  ok "Installed successfully"
+  echo "→ Run with: $APP_NAME"
+}
+
+# ---------------- UNINSTALL ----------------
+uninstall_app() {
+  log "Uninstalling $APP_NAME"
+
+  rm -f "$SYMLINK"
+  rm -rf "$INSTALL_DIR"
+
+  ok "Uninstalled successfully"
+}
+
+# ---------------- USAGE ----------------
+usage() {
+  cat <<EOF
+Usage: $CTL_NAME <command>
+
+Commands:
+  install     Install Termux App Store
+  update      Update to latest version
+  uninstall   Remove Termux App Store
+  help        Show this help
+EOF
+}
+
+# ---------------- MAIN ----------------
+cmd="${1:-help}"
+
+case "$cmd" in
+  install)
+    check_env
+    install_app
+    ;;
+  update)
+    check_env
+    install_app
+    ;;
+  uninstall)
+    uninstall_app
+    ;;
+  help|-h|--help)
+    usage
+    ;;
+  *)
+    err "Unknown command: $cmd"
+    ;;
+esac
