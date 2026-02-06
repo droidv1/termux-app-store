@@ -1,21 +1,37 @@
-# Termux App Store [![Community Ready](https://img.shields.io/badge/Community-Ready-2ea44f?style=for-the-badge&logo=github)](https://github.com/djunekz/termux-app-store)
+<div align="center">
+</br>
+  <img src=".assets/0.jpeg" width="400">
+</br>
+</div>
+
+<div align="center">
+  <h1>
+  Termux App Store
+  </h1>
+  
+  [![Community Ready](https://img.shields.io/badge/Community-Ready-2ea44f?style=for-the-badge&logo=github)](https://github.com/djunekz/termux-app-store)
+</div>
 
 This project follows community-driven standards including:
 - Public contribution workflows
 - Automated CI/CD pipelines
 - Issue & pull request templates
-- Transparent release and changelog process
----
-![CI](https://github.com/djunekz/termux-app-store/actions/workflows/build.yml/badge.svg)
-[![Codecov](https://codecov.io/github/djunekz/termux-app-store/branch/master/graph/badge.svg?token=357W4EP8G0)](https://codecov.io/github/djunekz/termux-app-store)
-[![Version](https://img.shields.io/github/v/release/djunekz/termux-app-store.svg?logo=iterm2&style=flat-square)](https://github.com/djunekz/termux-app-store/releases)
-[![License](https://img.shields.io/github/license/djunekz/termux-app-store.svg?logo=homepage&style=flat-square)](https://github.com/djunekz/termux-app-store/blob/master/LICENSE)
-![Issues](https://img.shields.io/github/issues/djunekz/termux-app-store?logo=openbugbounty&style=flat-square)
-![PRs](https://img.shields.io/github/issues-pr/djunekz/termux-app-store?logo=git&style=flat-square)
-![Downloads](https://img.shields.io/github/downloads/djunekz/termux-app-store/total?logo=abdownloadmanager&style=flat-square)
-![Contributors](https://img.shields.io/github/contributors/djunekz/termux-app-store?logo=github&style=flat-square)
-![Stars](https://img.shields.io/github/stars/djunekz/termux-app-store?logo=starship&style=flat-square)
-![Forks](https://img.shields.io/github/forks/djunekz/termux-app-store?logo=refinedgithub&style=flat-square)
+Transparent release and changelog process
+
+<div>
+  <p align ="center">
+    <img alt="CI" src="https://github.com/djunekz/termux-app-store/actions/workflows/build.yml/badge.svg"/></a>
+    <img alt="Codecov" src="https://codecov.io/github/djunekz/termux-app-store/branch/master/graph/badge.svg?&token=357W4EP8G0" href="https://codecov.io/github/djunekz/termux-app-store"/></a><br>
+    <img alt="Version" src="https://img.shields.io/github/v/release/djunekz/termux-app-store.svg?style=for-the-badge&logo=iterm2&color=green" href="ttps://github.com/djunekz/termux-app-store/releases"/>
+    <img alt="Download" src="https://img.shields.io/github/downloads/djunekz/termux-app-store/total?style=for-the-badge&logo=abdownloadmanager&color=green" href="https://github.com/djunekz/termux-app-store"/>
+    <img alt="License" src="https://img.shields.io/github/license/djunekz/termux-app-store.svg?style=for-the-badge&logo=homepage&color=green" href="https://github.com/djunekz/termux-app-store/blob/master/LICENSE"/><br>
+    <img alt="Stars" src="https://img.shields.io/github/stars/djunekz/termux-app-store?logo=starship&color=green"/>
+    <img alt="Forks" src="https://img.shields.io/github/forks/djunekz/termux-app-store?logo=refinedgithub&color=green"/><br>
+    <img alt="Issues" src="https://img.shields.io/github/issues/djunekz/termux-app-store?style=for-the-badge&logo=openbugbounty&color=green"/>
+    <img alt="Pull Request" src="https://img.shields.io/github/issues-pr/djunekz/termux-app-store?style=for-the-badge&logo=git&color=green"/>
+    <img alt="Contributors" src="https://img.shields.io/github/contributors/djunekz/termux-app-store?style=for-the-badge&logo=github&color=green"/>
+
+</div>
 
 > 🧠 **Offline-first • Source-based • Binary-safe • Termux-native**
 
@@ -36,11 +52,27 @@ This project follows community-driven standards including:
 
 ---
 
-## 📱Tools Interface / Screenshots
+<div align="center">
+  <h1>
+📱Tools Interface / Screenshots
+  </h1>
+</div>
+
 Feature:
 > User friendly and
 > Touchscreen Support
 
+<div>
+  <p align="middle">
+    <img src=".assets/0.jpeg" width="74%" /></br>
+    <img src=".assets/0main.jpg" width=24% />
+    <img src=".assets/1install.jpg" width=24% />
+    <img src=".assets/2pallete.jpg" width=24% />
+  </p>
+</div>
+
+<div align="center">
+  
 ### Menu Interface
 ![Main Interface](.assets/0main.jpg)
 
@@ -50,6 +82,8 @@ Feature:
 ### Menu Pallete Interface
 ![Menu Pallete Interface](.assets/2pallete.jpg)
 
+</div>
+  
 ---
 
 ## ✨ Fitur Utama
