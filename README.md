@@ -1,7 +1,9 @@
 # Termux App Store
 
-![Version](https://img.shields.io/github/v/release/djunekz/termux-app-store?logo=iterm2&style=flat-square)
-![License](https://img.shields.io/github/license/djunekz/termux-app-store?logo=open-source-initiative&style=flat-square)
+![CI](https://github.com/djunekz/termux-app-store/actions/workflows/build.yml/badge.svg)
+[![Coverage](https://img.shields.io/codecov/c/github/djunekz/termux-app-store.svg?logo=coveralls)](https://codecov.io/gh/djunekz/termux-app-store)
+[![Version](https://img.shields.io/github/v/release/djunekz/termux-app-store.svg?logo=iterm2&style=flat-square)](https://github.com/djunekz/termux-app-store/releases)
+[![License](https://img.shields.io/github/license/djunekz/termux-app-store.svg?logo=homepage&style=flat-square)](https://github.com/djunekz/termux-app-store/blob/master/LICENSE)
 ![Issues](https://img.shields.io/github/issues/djunekz/termux-app-store?logo=openbugbounty&style=flat-square)
 ![PRs](https://img.shields.io/github/issues-pr/djunekz/termux-app-store?logo=git&style=flat-square)
 ![Downloads](https://img.shields.io/github/downloads/djunekz/termux-app-store/total?logo=abdownloadmanager&style=flat-square)
