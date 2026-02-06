@@ -41,10 +41,13 @@ Feature:
 > User friendly and
 > Touchscreen Support
 
+### Menu Interface
 ![Main Interface](.assets/0main.jpg)
 
+### Install Interface
 ![Install Interface](.assets/1install.jpg)
 
+### Menu Pallete Interface
 ![Menu Pallete Interface](.assets/2pallete.jpg)
 
 ---
