@@ -1,5 +1,11 @@
 # Termux App Store [![Community Ready](https://img.shields.io/badge/Community-Ready-2ea44f?style=for-the-badge&logo=github)](https://github.com/djunekz/termux-app-store)
 
+This project follows community-driven standards including:
+- Public contribution workflows
+- Automated CI/CD pipelines
+- Issue & pull request templates
+- Transparent release and changelog process
+---
 ![CI](https://github.com/djunekz/termux-app-store/actions/workflows/build.yml/badge.svg)
 [![Codecov](https://codecov.io/github/djunekz/termux-app-store/branch/master/graph/badge.svg?token=357W4EP8G0)](https://codecov.io/github/djunekz/termux-app-store)
 [![Version](https://img.shields.io/github/v/release/djunekz/termux-app-store.svg?logo=iterm2&style=flat-square)](https://github.com/djunekz/termux-app-store/releases)
