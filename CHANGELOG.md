@@ -18,6 +18,7 @@ and this project adheres to semantic versioning.
 
 ## [v0.1.0] - 2026-02-02
 ### Added
+- Package `encrypt` v1.1
 - Textual-based TUI application for Termux
 - Package browser with search and live preview
 - Install / Update workflow using `build-package.sh`
