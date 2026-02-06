@@ -18,6 +18,9 @@ and this project adheres to semantic versioning.
 
 ## [v0.1.0] - 2026-02-02
 ### Added
+- Package `webshake` v1.0.2
+- Package `termstyle` v1.0.0
+- Package `tdoc` v1.0.5
 - Package `pmcli` v0.1.0
 - Package `encrypt` v1.1
 - Textual-based TUI application for Termux
