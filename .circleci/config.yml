@@ -1,0 +1,31 @@
+version: 2.1
+
+jobs:
+  coverage:
+    docker:
+      - image: cimg/python:3.12
+    steps:
+      - checkout
+
+      - run:
+          name: Install coverage
+          command: |
+            pip install --upgrade pip
+            pip install coverage
+
+      - run:
+          name: Run real CLI coverage
+          command: |
+            chmod +x termux-build tasctl || true
+            coverage run ci/run_cli.py
+            coverage xml
+
+      - run:
+          name: Upload coverage to Codecov
+          command: |
+            bash <(curl -s https://codecov.io/bash) -f coverage.xml
+
+workflows:
+  coverage:
+    jobs:
+      - coverage

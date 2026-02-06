@@ -1,4 +1,4 @@
-name: Termux App Store Build
+name: Termux App Store CI
 
 on:
   push:
@@ -18,12 +18,13 @@ jobs:
         with:
           fetch-depth: 0
 
-      - name: Setup
+      - name: Make scripts executable
         run: |
-          chmod +x termux-build
-          chmod +x tools/termux-build-create.sh
-          chmod +x tools/validate-build.sh
-          
+          chmod +x termux-build || true
+          chmod +x tasctl || true
+          chmod +x tools/termux-build-create.sh || true
+          chmod +x tools/validate-build.sh || true
+
       - name: Lint packages
         run: |
           set -e
@@ -42,7 +43,7 @@ jobs:
             [[ -d "$pkg" ]] || continue
             ./termux-build check-pr "$(basename "$pkg")"
           done
-          
+
       - name: Validate build scripts
         run: |
           set -e
@@ -57,3 +58,12 @@ jobs:
       - name: Generate templates (dry-run)
         run: |
           ./termux-build template --dry-run
+
+      - name: Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Run CLI validation
+        run: |
+          python ci/run_termux_build.py
