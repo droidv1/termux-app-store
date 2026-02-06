@@ -23,13 +23,13 @@ Transparent release and changelog process
     <img alt="CI" src="https://github.com/djunekz/termux-app-store/actions/workflows/build.yml/badge.svg"/></a>
     <img alt="Codecov" src="https://codecov.io/github/djunekz/termux-app-store/branch/master/graph/badge.svg?&token=357W4EP8G0" href="https://codecov.io/github/djunekz/termux-app-store"/></a><br>
     <img alt="Version" src="https://img.shields.io/github/v/release/djunekz/termux-app-store.svg?style=for-the-badge&logo=iterm2&color=green" href="ttps://github.com/djunekz/termux-app-store/releases"/>
-    <img alt="Download" src="https://img.shields.io/github/downloads/djunekz/termux-app-store/total?style=for-the-badge&logo=abdownloadmanager&color=green" href="https://github.com/djunekz/termux-app-store"/>
-    <img alt="License" src="https://img.shields.io/github/license/djunekz/termux-app-store.svg?style=for-the-badge&logo=homepage&color=green" href="https://github.com/djunekz/termux-app-store/blob/master/LICENSE"/><br>
-    <img alt="Stars" src="https://img.shields.io/github/stars/djunekz/termux-app-store?logo=starship&color=green"/>
+    <img alt="Download" src="https://img.shields.io/github/downloads/djunekz/termux-app-store/total?style=for-the-badge&logo=abdownloadmanager&logoColor=white&color=green" href="https://github.com/djunekz/termux-app-store"/>
+    <img alt="License" src="https://img.shields.io/github/license/djunekz/termux-app-store.svg?style=for-the-badge&logo=homepage&logoColor=white&color=green" href="https://github.com/djunekz/termux-app-store/blob/master/LICENSE"/><br>
+    <img alt="Stars" src="https://img.shields.io/github/stars/djunekz/termux-app-store?logo=starship&color=green&logoColor=black"/>
     <img alt="Forks" src="https://img.shields.io/github/forks/djunekz/termux-app-store?logo=refinedgithub&color=green"/><br>
-    <img alt="Issues" src="https://img.shields.io/github/issues/djunekz/termux-app-store?style=for-the-badge&logo=openbugbounty&color=green"/>
-    <img alt="Pull Request" src="https://img.shields.io/github/issues-pr/djunekz/termux-app-store?style=for-the-badge&logo=git&color=green"/>
-    <img alt="Contributors" src="https://img.shields.io/github/contributors/djunekz/termux-app-store?style=for-the-badge&logo=github&color=green"/>
+    <img alt="Issues" src="https://img.shields.io/github/issues/djunekz/termux-app-store?style=for-the-badge&logo=openbugbounty&logoColor=white&color=green"/>
+    <img alt="Pull Request" src="https://img.shields.io/github/issues-pr/djunekz/termux-app-store?style=for-the-badge&logo=git&logoColor=white&color=green"/>
+    <img alt="Contributors" src="https://img.shields.io/github/contributors/djunekz/termux-app-store?style=for-the-badge&logo=github&logoColor=white&color=green"/>
 
 </div>
 
