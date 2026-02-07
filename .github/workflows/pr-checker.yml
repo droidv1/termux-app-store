@@ -1,12 +1,16 @@
 name: PR Package Checker & Reported
 
 on:
-  pull_request:
-    types: [opened, synchronize, reopened]
+  workflow_run:
+    workflows: ["Lint PR Checker & Helper"]
+    types:
+      - completed
 
 jobs:
   review-packages:
+    if: contains(github.event.workflow_run.pull_requests[0].labels.*.name, 'review-approved')
     runs-on: ubuntu-latest
+    name: PR Package Build & Check
 
     steps:
       - name: Checkout repository
@@ -38,28 +42,21 @@ jobs:
         shell: bash
         run: |
           set -Eeuo pipefail
-
           FAIL=0
           REPORT=""
-
           if [[ -z "${{ steps.packages.outputs.changed }}" ]]; then
             REPORT+="ℹ️ No package changes detected"$'\n'
           fi
-
           for PKG in ${{ steps.packages.outputs.changed }}; do
             echo "=== Checking package: $PKG ==="
             BUILD_SH="packages/$PKG/build.sh"
             REPORT+="## 📦 $PKG"$'\n'
-
             if [[ ! -f "$BUILD_SH" ]]; then
               REPORT+="- ❌ build.sh missing"$'\n\n'
               FAIL=1
               continue
             fi
-
-            # Load build metadata
             source "$BUILD_SH" || true
-
             check() {
               if [[ -z "${!1:-}" ]]; then
                 REPORT+="- ❌ Missing \`$1\`"$'\n'
@@ -68,33 +65,26 @@ jobs:
                 REPORT+="- ✔ \`$1\`"$'\n'
               fi
             }
-
             check TERMUX_PKG_VERSION
             check TERMUX_PKG_SRCURL
             check TERMUX_PKG_SHA256
-
             if [[ ! "${TERMUX_PKG_SHA256:-}" =~ ^[a-f0-9]{64}$ ]]; then
               REPORT+="- ❌ Invalid SHA256 format"$'\n'
               FAIL=1
             fi
-
             if [[ "${TERMUX_PKG_SRCURL:-}" =~ (latest|master|main) ]]; then
               REPORT+="- ❌ Floating SRCURL (latest/master/main)"$'\n'
               FAIL=1
             fi
-
             REPORT+=$'\n'
-
             SRCURL=$(eval echo "${TERMUX_PKG_SRCURL:-}")
             TMPFILE="$(mktemp)"
-
             if ! curl -fsL "$SRCURL" -o "$TMPFILE"; then
               REPORT+="❌ Failed to download source"$'\n\n'
               FAIL=1
               rm -f "$TMPFILE"
               continue
             fi
-
             ACTUAL_SHA=$(sha256sum "$TMPFILE" | awk '{print $1}')
             if [[ "$ACTUAL_SHA" != "$TERMUX_PKG_SHA256" ]]; then
               REPORT+="❌ SHA256 mismatch"$'\n'
@@ -107,32 +97,26 @@ jobs:
             else
               REPORT+="✅ SHA256 verified"$'\n'
             fi
-
             rm -f "$TMPFILE"
-
             if ! ./build-package.sh "$PKG"; then
               REPORT+="❌ Build failed"$'\n'
               REPORT+="💡 Suggestion: Check build dependencies or install step"$'\n\n'
               FAIL=1
               continue
             fi
-
             BIN_CANDIDATES="${TERMUX_PKG_BIN_NAME:-$PKG}"
             FOUND_BIN=""
-
             for bin in $BIN_CANDIDATES; do
               if [[ -f ".local-prefix/bin/$bin" ]]; then
                 FOUND_BIN=".local-prefix/bin/$bin"
                 break
               fi
             done
-
             if [[ -z "$FOUND_BIN" ]]; then
               REPORT+="- ❌ Binary not found in .local-prefix/bin"$'\n\n'
               FAIL=1
               continue
             fi
-
             EXT="${FOUND_BIN##*.}"
             case "$EXT" in
               sh) RUN_CMD="bash $FOUND_BIN" ;;
@@ -140,7 +124,6 @@ jobs:
               js) RUN_CMD="node $FOUND_BIN" ;;
               *)  RUN_CMD="$FOUND_BIN" ;;
             esac
-
             if $RUN_CMD --help >/dev/null 2>&1 || $RUN_CMD >/dev/null 2>&1; then
               REPORT+="- ✅ Tool ran successfully (\`$FOUND_BIN\`)"$'\n\n'
             else
@@ -151,11 +134,9 @@ jobs:
               FAIL=1
             fi
           done
-
           echo "report<<EOF" >> "$GITHUB_OUTPUT"
           echo -e "$REPORT" >> "$GITHUB_OUTPUT"
           echo "EOF" >> "$GITHUB_OUTPUT"
-
           echo "fail=$FAIL" >> "$GITHUB_OUTPUT"
 
       - name: Post PR report
