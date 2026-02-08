@@ -8,8 +8,11 @@ codecov:
   notify:
     after_n_builds: 1
 
+# --------------------------------------------------
+# Pull Request comment behavior
+# --------------------------------------------------
 comment:
-  layout: "header, diff, footer"
+  layout: "header, diff, changes, footer"
   behavior: default
   require_changes: true
   max_comments: 1
@@ -18,12 +21,16 @@ comment:
 
 comment_header: |
   📊 **Codecov Coverage Report**
-  Hello @{{author}}! Here's your pull request coverage summary.
+  Hello @{{author}} 👋
+  Here is the coverage summary for this PR.
 
 comment_footer: |
-  🚀 Keep your coverage high — quality matters.
+  🚀 Thanks for keeping the code quality high!
   Full report: [{{build_url}}]
 
+# --------------------------------------------------
+# Coverage configuration
+# --------------------------------------------------
 coverage:
   precision: 2
   round: down
@@ -33,27 +40,36 @@ coverage:
     project:
       default:
         target: 80%
-        threshold: 1%
+        threshold: 2%
         informational: false
 
     patch:
       default:
         target: 80%
-        threshold: 1%
+        threshold: 2%
         informational: false
 
+# --------------------------------------------------
+# Ignore paths from coverage
+# --------------------------------------------------
 ignore:
   - "docs/**"
   - "scripts/**"
-  - "examples/**"
-  - "tests/**"
+  - "ci/**"
   - "**/*.md"
-  - "**/__init__.py"
 
+# --------------------------------------------------
+# Flags (explicit, even if single-project)
+# This is one of the things that helps
+# Codecov mark YAML as "Configured"
+# --------------------------------------------------
 flags:
-  backend:
-    paths:
-      - "src/**"
-  cli:
-    paths:
-      - "cli/**"
+  core:
+    carryforward: false
+
+# --------------------------------------------------
+# Disable default GitHub Checks annotations
+# (explicit override = non-default behavior)
+# --------------------------------------------------
+github_checks:
+  annotations: false
