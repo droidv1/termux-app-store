@@ -8,9 +8,6 @@ codecov:
   notify:
     after_n_builds: 1
 
-# --------------------------------------------------
-# Pull Request comment behavior
-# --------------------------------------------------
 comment:
   layout: "header, diff, changes, footer"
   behavior: default
@@ -28,9 +25,6 @@ comment_footer: |
   🚀 Thanks for keeping the code quality high!
   Full report: [{{build_url}}]
 
-# --------------------------------------------------
-# Coverage configuration
-# --------------------------------------------------
 coverage:
   precision: 2
   round: down
@@ -49,27 +43,15 @@ coverage:
         threshold: 2%
         informational: false
 
-# --------------------------------------------------
-# Ignore paths from coverage
-# --------------------------------------------------
 ignore:
   - "docs/**"
   - "scripts/**"
   - "ci/**"
   - "**/*.md"
 
-# --------------------------------------------------
-# Flags (explicit, even if single-project)
-# This is one of the things that helps
-# Codecov mark YAML as "Configured"
-# --------------------------------------------------
 flags:
   core:
     carryforward: false
 
-# --------------------------------------------------
-# Disable default GitHub Checks annotations
-# (explicit override = non-default behavior)
-# --------------------------------------------------
 github_checks:
   annotations: false
