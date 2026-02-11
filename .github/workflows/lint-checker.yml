@@ -79,12 +79,13 @@ jobs:
             echo "🔍 Validating content: $file"
             
             # Extract TERMUX_PKG_* variables from build.sh
-            SRCURL=$(grep -E '^TERMUX_PKG_SRCURL=' "$file" | head -1 | cut -d'=' -f2- | tr -d '"' | tr -d "'")
-            VERSION=$(grep -E '^TERMUX_PKG_VERSION=' "$file" | head -1 | cut -d'=' -f2- | tr -d '"' | tr -d "'")
-            SHA256=$(grep -E '^TERMUX_PKG_SHA256=' "$file" | head -1 | cut -d'=' -f2- | tr -d '"' | tr -d "'")
-            HOMEPAGE=$(grep -E '^TERMUX_PKG_HOMEPAGE=' "$file" | head -1 | cut -d'=' -f2- | tr -d '"' | tr -d "'")
-            DESCRIPTION=$(grep -E '^TERMUX_PKG_DESCRIPTION=' "$file" | head -1 | cut -d'=' -f2- | tr -d '"' | tr -d "'")
-            MAINTAINER=$(grep -E '^TERMUX_PKG_MAINTAINER=' "$file" | head -1 | cut -d'=' -f2- | tr -d '"' | tr -d "'")
+            # Use source to properly evaluate shell variables
+            SRCURL=$(grep -E '^TERMUX_PKG_SRCURL=' "$file" | head -1 | sed 's/^TERMUX_PKG_SRCURL=//' | sed "s/^['\"]//;s/['\"]$//" | tr -d "'")
+            VERSION=$(grep -E '^TERMUX_PKG_VERSION=' "$file" | head -1 | sed 's/^TERMUX_PKG_VERSION=//' | sed "s/^['\"]//;s/['\"]$//" | tr -d "'")
+            SHA256=$(grep -E '^TERMUX_PKG_SHA256=' "$file" | head -1 | sed 's/^TERMUX_PKG_SHA256=//' | sed "s/^['\"]//;s/['\"]$//" | tr -d "'")
+            HOMEPAGE=$(grep -E '^TERMUX_PKG_HOMEPAGE=' "$file" | head -1 | sed 's/^TERMUX_PKG_HOMEPAGE=//' | sed "s/^['\"]//;s/['\"]$//" | tr -d "'")
+            DESCRIPTION=$(grep -E '^TERMUX_PKG_DESCRIPTION=' "$file" | head -1 | sed 's/^TERMUX_PKG_DESCRIPTION=//' | sed "s/^['\"]//;s/['\"]$//" | tr -d "'")
+            MAINTAINER=$(grep -E '^TERMUX_PKG_MAINTAINER=' "$file" | head -1 | sed 's/^TERMUX_PKG_MAINTAINER=//' | sed "s/^['\"]//;s/['\"]$//" | tr -d "'")
             
             echo "   SRCURL: $SRCURL"
             echo "   VERSION: $VERSION"
@@ -147,9 +148,20 @@ jobs:
             # ============================================================
             echo "📥 Attempting to download from SRCURL..."
             
-            # Replace ${TERMUX_PKG_VERSION} with actual version in SRCURL
-            DOWNLOAD_URL="${SRCURL//\$\{TERMUX_PKG_VERSION\}/$VERSION}"
-            DOWNLOAD_URL="${DOWNLOAD_URL//\${TERMUX_PKG_VERSION}/$VERSION}"
+            # Replace ${TERMUX_PKG_VERSION} dengan VERSION
+            DOWNLOAD_URL="$SRCURL"
+            DOWNLOAD_URL="${DOWNLOAD_URL//\$\{TERMUX_PKG_VERSION\}/$VERSION}"
+            DOWNLOAD_URL="${DOWNLOAD_URL//\$TERMUX_PKG_VERSION/$VERSION}"
+            
+            # Check if URL masih ada placeholder atau syntax error (closing brace tanpa opening)
+            if [[ "$DOWNLOAD_URL" =~ \}\} ]] || [[ "$DOWNLOAD_URL" =~ \}\$ ]] || [[ "$DOWNLOAD_URL" =~ [^{]\}[^}] ]]; then
+              echo "❌ TERMUX_PKG_SRCURL contains invalid syntax (unclosed variables or extra braces)"
+              echo "   Original: $SRCURL"
+              echo "   Processed: $DOWNLOAD_URL"
+              VALIDATION_ERROR=1
+              VALIDATION_DETAILS="${VALIDATION_DETAILS}❌ Invalid SRCURL syntax - contains unclosed variables or malformed braces: $SRCURL\n"
+              continue
+            fi
             
             echo "   Final URL: $DOWNLOAD_URL"
             
@@ -180,12 +192,14 @@ jobs:
               # VALIDATION 6b: Handle download error
               # ============================================================
               HTTP_CODE=$(curl -L -s -o /dev/null -w "%{http_code}" "$DOWNLOAD_URL" 2>/dev/null || echo "000")
-              echo "⚠️  WARNING: Could not download $DOWNLOAD_URL (HTTP: $HTTP_CODE)"
-              echo "   The URL may be unreachable, require authentication, or contain errors"
+              echo "❌ ERROR: Could not download from URL"
+              echo "   URL: $DOWNLOAD_URL"
+              echo "   HTTP Status: $HTTP_CODE"
+              echo "   The URL may be unreachable, contain errors, or require authentication"
               
               # Treat download failure as validation error
               VALIDATION_ERROR=1
-              VALIDATION_DETAILS="${VALIDATION_DETAILS}⚠️  SRCURL unreachable or invalid (HTTP: $HTTP_CODE): $DOWNLOAD_URL\n"
+              VALIDATION_DETAILS="${VALIDATION_DETAILS}❌ SRCURL unreachable or invalid (HTTP: $HTTP_CODE)\n   URL: $DOWNLOAD_URL\n"
             fi
             
             # ============================================================
@@ -286,21 +300,26 @@ jobs:
               comment += '### ❌ Package Validation Errors\n\n';
               comment += 'Your build.sh file failed validation checks:\n\n';
               comment += validationDetails || 'Please ensure:\n';
-              comment += '- ✅ `TERMUX_PKG_VERSION` is defined\n';
-              comment += '- ✅ `TERMUX_PKG_SRCURL` is a valid HTTP(S) URL\n';
-              comment += '- ✅ `TERMUX_PKG_SHA256` is 64 hexadecimal characters\n';
-              comment += '- ✅ SHA256 checksum matches the actual downloaded file\n';
-              comment += '- ✅ `TERMUX_PKG_HOMEPAGE` is a valid URL (optional)\n';
-              comment += '- ✅ `TERMUX_PKG_DESCRIPTION` is provided (optional)\n';
-              comment += '- ✅ `TERMUX_PKG_MAINTAINER` is provided (optional)\n\n';
+              comment += '- `TERMUX_PKG_VERSION` is defined\n';
+              comment += '- `TERMUX_PKG_SRCURL` is a valid HTTP(S) URL without malformed braces\n';
+              comment += '- `TERMUX_PKG_SHA256` is 64 hexadecimal characters\n';
+              comment += '- SHA256 checksum matches the actual downloaded file\n';
+              comment += '- `TERMUX_PKG_HOMEPAGE` is a valid URL (optional)\n';
+              comment += '- `TERMUX_PKG_DESCRIPTION` is provided (optional)\n';
+              comment += '- `TERMUX_PKG_MAINTAINER` is provided (optional)\n\n';
             }
             
             comment += '---\n\n';
             comment += '**How to fix:**\n';
-            comment += '1. Download the source file from your SRCURL\n';
-            comment += '2. Generate correct SHA256: `sha256sum <filename>`\n';
-            comment += '3. Update build.sh with correct values\n';
-            comment += '4. Push new commit to your PR\n\n';
+            comment += '1. Check SRCURL syntax - ensure all `${TERMUX_PKG_VERSION}` variables are properly closed\n';
+            comment += '2. Download the source file from your SRCURL manually to verify it works\n';
+            comment += '3. Generate correct SHA256: `sha256sum <filename>`\n';
+            comment += '4. Update build.sh with correct values\n';
+            comment += '5. Push new commit to your PR\n\n';
+            comment += '**Example correct SRCURL:**\n';
+            comment += '```bash\n';
+            comment += 'TERMUX_PKG_SRCURL=https://github.com/droidv1/termool/releases/download/v${TERMUX_PKG_VERSION}/iptrack.tar.gz\n';
+            comment += '```\n\n';
             comment += '**Need help?** Check [repository guidelines](https://github.com/djunekz/termux-app-store/blob/master/README.md)\n';
             
             github.rest.issues.createComment({
@@ -319,5 +338,5 @@ jobs:
               issue_number: context.issue.number,
               owner: context.repo.owner,
               repo: context.repo.repo,
-              body: '## ✅ Build Script Validation Passed\n\nYour build.sh has passed all automated checks:\n\n- ✅ Bash syntax is correct\n- ✅ TERMUX_PKG_VERSION is defined\n- ✅ TERMUX_PKG_SRCURL is valid and reachable\n- ✅ TERMUX_PKG_SHA256 format is correct\n- ✅ SHA256 checksum verified (matches downloaded file)\n- ✅ Package metadata is complete\n\n**Status:** Ready for maintainer review! 🎉'
+              body: '## ✅ Build Script Validation Passed\n\nYour build.sh has passed all automated checks:\n\n- ✅ Bash syntax is correct\n- ✅ TERMUX_PKG_VERSION is defined\n- ✅ TERMUX_PKG_SRCURL is valid and reachable\n- ✅ TERMUX_PKG_SHA256 is valid format\n- ✅ SHA256 checksum verified\n\nReady for review! 🎉'
             });
