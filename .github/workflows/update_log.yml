@@ -6,10 +6,6 @@ on:
       - master
     paths:
       - 'packages/**/build.sh'
-  pull_request:
-    branches:
-      - master
-    types: [closed]
 
 permissions:
   contents: write
@@ -18,13 +14,10 @@ jobs:
   changelog:
     name: Update Changelog
     runs-on: ubuntu-latest
-    if: |
-      (github.event_name == 'push') ||
-      (github.event_name == 'pull_request' && github.event.pull_request.merged == true)
 
     steps:
       - name: Checkout repository
-        uses: actions/checkout@v6
+        uses: actions/checkout@v4
         with:
           fetch-depth: 0
           token: ${{ secrets.GITHUB_TOKEN }}
@@ -36,7 +29,6 @@ jobs:
 
           CHANGELOG="CHANGELOG.md"
 
-          # Initialize changelog if it doesn't exist
           if [[ ! -f "$CHANGELOG" ]]; then
             printf "%s\n" \
               "# Changelog" \
@@ -49,101 +41,45 @@ jobs:
               "### Fixed" \
               "" \
               > "$CHANGELOG"
-            echo "[✓] Created new CHANGELOG.md"
+            echo "[✓] Created CHANGELOG.md"
           fi
 
-          # Find changed packages
-          CHANGED_FILES=""
-          
-          if [[ "${{ github.event_name }}" == "push" ]]; then
-            # For push events
-            if [[ "${{ github.event.before }}" != "0000000000000000000000000000000000000000" ]]; then
-              CHANGED_FILES=$(git diff --name-only ${{ github.event.before }}..${{ github.event.after }} | grep '^packages/.*/build\.sh' || true)
-            else
-              # First push to branch, get all build.sh files
-              CHANGED_FILES=$(find packages -name "build.sh" -type f)
-            fi
-          elif [[ "${{ github.event_name }}" == "pull_request" ]]; then
-            # For merged pull requests
-            CHANGED_FILES=$(git diff --name-only ${{ github.event.pull_request.base.sha }}..${{ github.event.pull_request.head.sha }} | grep '^packages/.*/build\.sh' || true)
-          fi
+          CHANGED_FILES=$(git diff --name-only ${{ github.event.before }} ${{ github.sha }} | grep '^packages/.*/build\.sh' || true)
 
           if [[ -z "$CHANGED_FILES" ]]; then
             echo "[ℹ] No package changes detected"
             exit 0
           fi
 
-          echo "[✓] Detected changes in:"
+          echo "[✓] Changed packages:"
           echo "$CHANGED_FILES"
 
-          # Extract the [Unreleased] section content
-          UNRELEASED_START=$(grep -n "^## \[Unreleased\]" "$CHANGELOG" | head -1 | cut -d: -f1)
-          UNRELEASED_END=$(tail -n +$((UNRELEASED_START + 1)) "$CHANGELOG" | grep -n "^## \[" | head -1 | cut -d: -f1)
-          
-          if [[ -z "$UNRELEASED_END" ]]; then
-            # No other version headers, use end of file
-            UNRELEASED_END=$(wc -l < "$CHANGELOG")
-          else
-            UNRELEASED_END=$((UNRELEASED_START + UNRELEASED_END - 1))
-          fi
-
-          # Process each changed package
-          while IFS= read -r build_file; do
-            [[ -z "$build_file" ]] && continue
-            
+          for build_file in $CHANGED_FILES; do
             pkg_dir=$(dirname "$build_file")
             pkg_name=$(basename "$pkg_dir")
-            
-            # Extract version from build.sh
-            if [[ ! -f "$build_file" ]]; then
-              echo "[⚠] File not found: $build_file"
-              continue
-            fi
-            
-            pkg_version=$(grep '^TERMUX_PKG_VERSION=' "$build_file" | head -1 | cut -d= -f2 | tr -d '\n')
-            
+
+            pkg_version=$(grep '^TERMUX_PKG_VERSION=' "$build_file" | cut -d= -f2)
+
             if [[ -z "$pkg_version" ]]; then
-              echo "[⚠] Could not extract version from $build_file"
               continue
             fi
 
-            # Determine if package is new or updated (ONLY in [Unreleased] section)
-            if sed -n "${UNRELEASED_START},${UNRELEASED_END}p" "$CHANGELOG" | grep -q "Package \`${pkg_name}\`"; then
-              section="Updated"
-            else
-              section="Added"
+            if ! grep -q "\`${pkg_name}\` v${pkg_version}" "$CHANGELOG"; then
+              sed -i "/### Updated/a - Package \`${pkg_name}\` v${pkg_version}" "$CHANGELOG"
+              echo "[✓] Updated: ${pkg_name} v${pkg_version}"
             fi
-
-            # Check if entry already exists in [Unreleased] section only
-            if ! sed -n "${UNRELEASED_START},${UNRELEASED_END}p" "$CHANGELOG" | grep -q "\`${pkg_name}\` v${pkg_version}"; then
-              # Find the section line within [Unreleased] and add entry after it
-              # This is more complex - we need to find the right "### ${section}" line within [Unreleased]
-              SECTION_LINE=$(awk "NR>=${UNRELEASED_START} && NR<=${UNRELEASED_END} && /^### ${section}$/ {print NR; exit}" "$CHANGELOG")
-              
-              if [[ -n "$SECTION_LINE" ]]; then
-                sed -i "${SECTION_LINE}a - Package \`${pkg_name}\` v${pkg_version}" "$CHANGELOG"
-                echo "[✓] Added/Updated: \`${pkg_name}\` v${pkg_version} to ${section} (in [Unreleased])"
-              else
-                echo "[⚠] Could not find section '### ${section}' in [Unreleased]"
-              fi
-            else
-              echo "[ℹ] Entry already exists in [Unreleased]: \`${pkg_name}\` v${pkg_version}"
-            fi
-          done <<< "$CHANGED_FILES"
+          done
 
       - name: Commit & push changelog
-        shell: bash
         run: |
           git config user.name "Termux App Store Bot"
           git config user.email "258516621+termux-app-store@users.noreply.github.com"
 
           if git diff --quiet CHANGELOG.md; then
-            echo "[ℹ] No changes to commit"
+            echo "[ℹ] Nothing to commit"
             exit 0
           fi
 
           git add CHANGELOG.md
-          git commit -m "docs: update changelog for package changes [ci skip]" \
-            -m "Auto-generated changelog update" || true
-          
-          git push origin master || echo "[⚠] Push failed (might be due to concurrent updates)"
+          git commit -m "Update/Added packages: update changelog [ci skip]" || true
+          git push origin master
