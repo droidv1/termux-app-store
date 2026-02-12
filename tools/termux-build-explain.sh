@@ -1,63 +1,61 @@
 #!/usr/bin/env bash
 set -eo pipefail
 
+source "$(dirname "$0")/colors.sh"
+
 PKG="${1:-}"
 
 if [[ -z "$PKG" ]]; then
-  echo "❌ Usage: termux-build explain <package>"
+  echo -e "${BOLD_RED}❌ Usage: termux-build explain <package>${RESET}"
   exit 1
 fi
 
 FILE="packages/$PKG/build.sh"
 
 if [[ ! -f "$FILE" ]]; then
-  echo "❌ build.sh not found for package: $PKG"
+  echo -e "${BOLD_RED}❌ build.sh not found for package: $PKG${RESET}"
   exit 1
 fi
 
-# shellcheck disable=SC1090
 source "$FILE" || true
 
-echo "🧠 PR Risk Analysis: $PKG"
-echo "========================"
+echo -e "${CYAN}🧠 PR Risk Analysis: $PKG${RESET}"
+echo -e "${CYAN}========================${RESET}"
 
 RISK=0
 WARN=0
 
 fatal() {
-  echo "❌ FATAL : $1"
+  echo -e "${BOLD_RED}❌ FATAL : $1${RESET}"
   RISK=1
 }
 
 warn() {
-  echo "⚠️  WARN  : $1"
+  echo -e "${BOLD_YELLOW}⚠️  WARN  : $1${RESET}"
   WARN=1
 }
 
 ok() {
-  echo "✔ OK     : $1"
+  echo -e "${BOLD_GREEN}✔ OK     : $1${RESET}"
 }
 
-# ---- Mandatory checks (PR blockers)
 [[ -z "${TERMUX_PKG_SRCURL:-}"   ]] && fatal "TERMUX_PKG_SRCURL missing"   || ok "SRCURL present"
 [[ -z "${TERMUX_PKG_SHA256:-}"  ]] && fatal "TERMUX_PKG_SHA256 missing"  || ok "SHA256 present"
 [[ -z "${TERMUX_PKG_VERSION:-}" ]] && fatal "TERMUX_PKG_VERSION missing" || ok "VERSION present"
 [[ -z "${TERMUX_PKG_LICENSE:-}" ]] && fatal "TERMUX_PKG_LICENSE missing" || ok "LICENSE present"
 
-# ---- Soft checks (reviewer comments)
 [[ -z "${TERMUX_PKG_HOMEPAGE:-}" ]] && warn "No homepage set (optional but recommended)"
 [[ -n "${TERMUX_PKG_DESCRIPTION:-}" && ${#TERMUX_PKG_DESCRIPTION} -lt 15 ]] \
   && warn "Description is very short"
 
-# ---- Summary
 echo
 if [[ $RISK -eq 1 ]]; then
-  echo "🚫 High risk: PR likely to be rejected"
+  echo -e "${BOLD_RED}🚫 High risk: PR likely to be rejected${RESET}"
 elif [[ $WARN -eq 1 ]]; then
-  echo "⚠️  Medium risk: PR may get reviewer comments"
+  echo -e "${BOLD_YELLOW}⚠️  Medium risk: PR may get reviewer comments${RESET}"
 else
-  echo "🟢 Low risk: PR looks clean and review-friendly"
+  echo -e "${BOLD_GREEN}🟢 Low risk: PR looks clean and review-friendly${RESET}"
 fi
 
 echo
-echo "(Analysis only, no changes made)"
+echo -e "${CYAN}(Analysis only, no changes made)${RESET}"

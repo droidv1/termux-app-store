@@ -1,31 +1,32 @@
 #!/usr/bin/env bash
 set -eo pipefail
 
+source "$(dirname "$0")/colors.sh"
+
 PKG="${1:-}"
 
 if [[ -z "$PKG" ]]; then
-  echo "❌ Usage: termux-build suggest <package>"
+  echo -e "${BOLD_RED}❌ Usage: termux-build suggest <package>${RESET}"
   exit 1
 fi
 
 FILE="packages/$PKG/build.sh"
 
 if [[ ! -f "$FILE" ]]; then
-  echo "❌ build.sh not found for package: $PKG"
+  echo -e "${BOLD_RED}❌ build.sh not found for package: $PKG${RESET}"
   exit 1
 fi
 
-# shellcheck disable=SC1090
 source "$FILE" || true
 
-echo "💡 Suggestions for $PKG"
-echo "======================="
+echo -e "${BOLD_CYAN}💡 Suggestions for $PKG${RESET}"
+echo -e "${CYAN}=======================${RESET}"
 
 SUGGESTIONS=0
 
 suggest_missing() {
   if [[ -z "${!1:-}" ]]; then
-    echo "- add $1=\"...\""
+    echo -e "${YELLOW}- add $1=\"...\"${RESET}"
     SUGGESTIONS=1
   fi
 }
@@ -33,7 +34,7 @@ suggest_missing() {
 suggest_quality() {
   local val="${!1:-}"
   if [[ -n "$val" && ${#val} -lt 10 ]]; then
-    echo "- consider improving $1 (too short)"
+    echo -e "${MAGENTA}- consider improving $1 (too short)${RESET}"
     SUGGESTIONS=1
   fi
 }
@@ -52,5 +53,5 @@ suggest_quality TERMUX_PKG_DESCRIPTION
 suggest_quality TERMUX_PKG_HOMEPAGE
 
 if [[ $SUGGESTIONS -eq 0 ]]; then
-  echo "✔ No suggestions — build.sh already looks solid"
+  echo -e "${BOLD_GREEN}✔ No suggestions — build.sh already looks solid${RESET}"
 fi

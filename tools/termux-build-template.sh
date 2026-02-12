@@ -1,18 +1,18 @@
 #!/usr/bin/env bash
 
-cat <<'EOF'
-# build.sh template (Termux package)
+source "$(dirname "$0")/colors.sh"
 
-TERMUX_PKG_HOMEPAGE=https://example.com
-TERMUX_PKG_DESCRIPTION="Short description"
-TERMUX_PKG_LICENSE="MIT"
-TERMUX_PKG_MAINTAINER="Your Name <email>"
-TERMUX_PKG_VERSION=1.0.0
-TERMUX_PKG_SRCURL="https://example.com/${TERMUX_PKG_VERSION}.tar.gz"
-TERMUX_PKG_SHA256=<INPUT_SHA256_HERE>
-TERMUX_PKG_DEPENDS="python, bash, and etc"
+echo -e "${BOLD_CYAN}# build.sh template (Termux package)${RESET}\n"
 
-termux_step_make_install() {
-  install -Dm755 yourtool $TERMUX_PREFIX/bin/yourtool
-}
-EOF
+echo -e "${BOLD_YELLOW}TERMUX_PKG_HOMEPAGE${RESET}=https://example.com"
+echo -e "${BOLD_YELLOW}TERMUX_PKG_DESCRIPTION${RESET}=\"Short description\""
+echo -e "${BOLD_YELLOW}TERMUX_PKG_LICENSE${RESET}=\"MIT\""
+echo -e "${BOLD_YELLOW}TERMUX_PKG_MAINTAINER${RESET}=\"Your Name <email>\""
+echo -e "${BOLD_YELLOW}TERMUX_PKG_VERSION${RESET}=1.0.0"
+echo -e "${BOLD_YELLOW}TERMUX_PKG_SRCURL${RESET}=\"https://example.com/\${TERMUX_PKG_VERSION}.tar.gz\""
+echo -e "${BOLD_YELLOW}TERMUX_PKG_SHA256${RESET}=<INPUT_SHA256_HERE>"
+echo -e "${BOLD_YELLOW}TERMUX_PKG_DEPENDS${RESET}=\"python, bash, and etc\"\n"
+
+echo -e "${BOLD_GREEN}termux_step_make_install() {${RESET}"
+echo -e "  install -Dm755 yourtool \$TERMUX_PREFIX/bin/yourtool"
+echo -e "${BOLD_GREEN}}${RESET}"
