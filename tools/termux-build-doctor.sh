@@ -1,7 +1,21 @@
 #!/usr/bin/env bash
 set -e
 
-source "$(dirname "$0")/colors.sh"
+ROOT="$(cd "$(dirname "$0")/.." && pwd)"
+COLORS_FILE="$ROOT/tools/colors.sh"
+
+# Safe color loader (CI friendly)
+if [[ -f "$COLORS_FILE" ]]; then
+  # shellcheck disable=SC1090
+  source "$COLORS_FILE"
+else
+  BOLD_GREEN=""
+  BOLD_YELLOW=""
+  BOLD_RED=""
+  CYAN=""
+  WHITE=""
+  RESET=""
+fi
 
 echo -e "${CYAN}🩺 termux-build doctor${RESET}"
 echo -e "${CYAN}======================${RESET}"

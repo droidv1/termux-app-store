@@ -1,15 +1,28 @@
 #!/usr/bin/env bash
-set -e
+set -euo pipefail
 
 ROOT="$(cd "$(dirname "$0")" && pwd)"
-COMMAND="${1:-}"
 BASE_DIR="$ROOT/tools"
-source "$BASE_DIR/colors.sh"
+COMMAND="${1:-}"
+
+COLORS_FILE="$BASE_DIR/colors.sh"
+
+if [[ -f "$COLORS_FILE" ]]; then
+  source "$COLORS_FILE"
+else
+  RED=""
+  GREEN=""
+  CYAN=""
+  BOLD_RED=""
+  BOLD_GREEN=""
+  BOLD_CYAN=""
+  RESET=""
+fi
 
 case "$COMMAND" in
     create|-c|-C)
         shift
-        exec "$ROOT/tools/termux-build-create.sh" "$@"
+        exec "$BASE_DIR/termux-build-create.sh" "$@"
         ;;
 
     lint|-l|-L)
@@ -18,6 +31,7 @@ case "$COMMAND" in
         ;;
 
     check-pr|-cpr|-pr)
+        shift
         exec "$BASE_DIR/termux-build-check-pr.sh" "$@"
         ;;
 
@@ -44,7 +58,7 @@ case "$COMMAND" in
         ;;
 
     *)
-        echo -e "${RED}Usage:${RESET}"
+        echo -e "${BOLD_RED}Usage:${RESET}"
         echo -e "  ${GREEN}./termux-build create <package>${RESET}"
         echo -e "  ${GREEN}./termux-build lint <path | package-name>${RESET}"
         echo -e "  ${GREEN}./termux-build check-pr <package>${RESET}"

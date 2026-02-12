@@ -1,11 +1,26 @@
 #!/usr/bin/env bash
 set -Eeuo pipefail
 
-source "$(dirname "$0")/colors.sh"
+# Safe color loader (CI friendly)
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+COLORS_FILE="$SCRIPT_DIR/colors.sh"
 
-FILE="$1"
+if [[ -f "$COLORS_FILE" ]]; then
+  # shellcheck disable=SC1090
+  source "$COLORS_FILE"
+else
+  # fallback if colors.sh not found (prevent CI failure)
+  BOLD_RED=""
+  BOLD_GREEN=""
+  BOLD_YELLOW=""
+  BOLD_CYAN=""
+  CYAN=""
+  RESET=""
+fi
 
-if [[ -z "${FILE:-}" ]]; then
+FILE="${1:-}"
+
+if [[ -z "$FILE" ]]; then
     echo -e "${BOLD_YELLOW}Usage:${RESET} validate-build.sh <path/to/build.sh>"
     exit 2
 fi
@@ -57,6 +72,7 @@ if grep -q "apt install" "$FILE"; then
 fi
 
 # ---------- SOURCE SHA256 CHECK ----------
+# shellcheck disable=SC1090
 source "$FILE"
 eval "SRCURL=\"$TERMUX_PKG_SRCURL\""
 EXPECTED_SHA="${TERMUX_PKG_SHA256:-}"
@@ -65,12 +81,14 @@ if [[ -n "$SRCURL" && -n "$EXPECTED_SHA" ]]; then
     echo
     echo -e "${BOLD_CYAN}🔎 Verifying SHA256 of source package 📦 $PACKAGE_NAME...${RESET}"
     TMPFILE=$(mktemp)
+
     if ! curl -sL "$SRCURL" -o "$TMPFILE"; then
         echo -e "${BOLD_RED}❌ Failed to download source from $SRCURL${RESET}"
         FAIL=1
     else
         ACTUAL_SHA=$(sha256sum "$TMPFILE" | awk '{print $1}')
         rm -f "$TMPFILE"
+
         if [[ "$ACTUAL_SHA" != "$EXPECTED_SHA" ]]; then
             echo -e "${BOLD_RED}❌ SHA256 mismatch!${RESET}"
             echo -e "   Expected: ${BOLD_YELLOW}$EXPECTED_SHA${RESET}"
@@ -84,6 +102,7 @@ fi
 
 # ---------- RESULT ----------
 echo -e "${CYAN}-------------------------------------------------${RESET}"
+
 if [[ "$FAIL" -eq 1 ]]; then
     echo -e "${BOLD_RED}❌ VALIDATION FAILED${RESET}"
     exit 1

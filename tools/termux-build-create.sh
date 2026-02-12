@@ -1,10 +1,21 @@
 #!/usr/bin/env bash
 set -Eeuo pipefail
 
-source "$(cd "$(dirname "$0")" && pwd)/colors.sh"
+ROOT="$(cd "$(dirname "$0")/.." && pwd)"
+COLORS_FILE="$ROOT/tools/colors.sh"
+
+if [[ -f "$COLORS_FILE" ]]; then
+  source "$COLORS_FILE"
+else
+  BOLD_RED=""
+  BOLD_GREEN=""
+  BOLD_YELLOW=""
+  BOLD_CYAN=""
+  CYAN=""
+  RESET=""
+fi
 
 PKG="${1:-}"
-ROOT="$(cd "$(dirname "$0")/.." && pwd)"
 PKG_DIR="$ROOT/packages"
 TEMPLATE="$ROOT/template/build.sh"
 

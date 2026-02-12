@@ -1,11 +1,25 @@
 #!/usr/bin/env bash
+set -e
 
-# Load colors
-source "$(dirname "$0")/colors.sh"
+ROOT="$(cd "$(dirname "$0")/.." && pwd)"
+COLORS_FILE="$ROOT/tools/colors.sh"
+
+# Safe color loader (CI friendly)
+if [[ -f "$COLORS_FILE" ]]; then
+  # shellcheck disable=SC1090
+  source "$COLORS_FILE"
+else
+  CYAN=""
+  WHITE=""
+  BOLD_BLUE=""
+  BOLD_GREEN=""
+  BOLD_RED=""
+  RESET=""
+fi
 
 cat <<EOF
 ${CYAN}📦 Termux App Store – Contributor Guide${RESET}
-${CYAN}======================================${RESET}
+${CYAN}=======================================${RESET}
 
 1. ${WHITE}termux-build DOES NOT modify files${RESET}
 2. ${WHITE}termux-build is NOT a build system${RESET}
